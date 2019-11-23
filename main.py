@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 #from ev3dev2.sound import Sound #dicionário que permite tocar músicas
+
 from ev3dev.ev3 import * #nao sei a diferença do de cima
 from time import sleep
 from threading import Thread #dicionário que permite executar ações ao mesmo tempo
@@ -9,6 +10,10 @@ from PIL import Image #dicionário que permite apresentar imagens .bmp no lcd
 from ev3dev2.sensor.lego import GyroSensor
 
 from threading import Thread #dicionário que permite executar ações ao mesmo tempo
+
+
+import colorTest
+
 
             #############################################
             #               TO DO LIST                  #
@@ -34,7 +39,7 @@ gyro.mode='GYRO-ANG'
 
 #constantes
 ROTACOES_CASA = 2.2
-VELOCIDADE_PADRAO = 40
+VELOCIDADE_PADRAO = 20
 #angulos por padrão, sempre à direita
 ANGULO_90 = 87
 
@@ -86,7 +91,9 @@ def delta():
 
         print("POS FINAL: " + str(gy.angle) + " " + units)
 
-
+def ler_lista():
+    colorTest.check_colour()
+    print(colorTest.lista)
 #############################################
 #            Funcoes avançadas              #
 #############################################
@@ -112,11 +119,6 @@ funcao que verifica se há figura completa e atribui pontos
 t = Thread(target=delta)
 t.start()
 
-#drop()
-#move_backward(ROTACOES_CASA)
-move_forward(4*ROTACOES_CASA)
-turn(ANGULO_90)
-move_forward(4*ROTACOES_CASA)
-turn(ANGULO_90)
-move_forward(4*ROTACOES_CASA)
-turn(ANGULO_90)
+s = Thread(target=ler_lista)
+s.start()
+

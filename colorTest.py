@@ -8,12 +8,26 @@ from time   import sleep
 cl = ColorSensor() 
 ts = TouchSensor()
 
-# Put the color sensor into COL-COLOR mode.
-cl.mode='COL-COLOR'
+lista = []
 
-colors=('unknown','black','blue','green','yellow','red','white','brown')
-while True:    # Stop program by pressing touch sensor button
-    print(colors[cl.value()])
-    Sound.speak(colors[cl.value()]).wait()
-    sleep(3)
-Sound.beep()
+#Adicionar as peças numa lista
+def adiciona_pecas(type):
+    lista.append(type)
+
+
+# Put the color sensor into COL-COLOR mode.
+
+cl.mode='COL-COLOR'
+def check_colour():
+    colors=('unknown','black','blue','green','yellow','red','white','brown')
+    while True:    # Stop program by pressing touch sensor button
+        if colors[cl.value()] == 'red':
+            return lista
+
+        else:
+            if colors[cl.value()] != 'white':
+                adiciona_pecas(colors[cl.value()])
+
+    Sound.beep()
+    
+
