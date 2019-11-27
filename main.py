@@ -2,7 +2,8 @@
 #from ev3dev2.sound import Sound #dicionário que permite tocar músicas
 from ev3dev.ev3 import * #nao sei a diferença do de cima
 from time import sleep
-from threading import Thread #dicionário que permite executar ações ao mesmo tempo
+#from threading import Thread #dicionário que permite executar ações ao mesmo tempo
+from multiprocessing import Process #multi-process
     #dicionário dos motores disponíveis e usados no robot
 from ev3dev2.motor import LargeMotor, MediumMotor, MoveSteering, OUTPUT_D, OUTPUT_A, OUTPUT_B, SpeedRPS
 from PIL import Image #dicionário que permite apresentar imagens .bmp no lcd
@@ -42,7 +43,7 @@ ROTACOES_CASA = 2.2 #cada casa é +/- 2.2 rotações
 DISTANCIA_PROCURA = 40 #distância maxima a que o objeto tem de estar
 DISTANCIA_MIN = 10 #distância final do robot ao objeto
 
-VELOCIDADE_PADRAO = 40 
+VELOCIDADE_PADRAO = 10
 VELOCIDADE_PROCURA = 20 #velocidade durante a procura, mais lenta para maior precisão
 VELOCIDADE_AJUSTE = 10 #velocidade para ajustar a posição do robot, super lento para não andar em excesso aos zig zags
 
@@ -139,10 +140,6 @@ def pick():
 def drop():
     #larga objeto da garra
     motor_garra.on_for_seconds(speed=-100, seconds=2) #abrir garra
-
-def ler_lista():
-    colorTest.check_colour()
-    print(colorTest.lista)
 
 #############################################
 #            Funcoes avançadas              #
@@ -263,18 +260,12 @@ def procura():
 gyro.mode = 'GYRO-RATE'
 gyro.mode = 'GYRO-ANG'
 
+'''
 move_forward(4) #subir até a posição [0][0]
 procura() #iniciar a procura da lista de peças -- (esta funcão já da reset ao gyro, cuidado!)
 
 
-
-
-
-
-
-
-
-
+'''
 
 
 
@@ -296,4 +287,33 @@ posicao do robot, usar gyro (não dar reset ao gyro durante o jogo)
 ou
 atualizar posicao a cada uso de funcao
     podemos usar direita e esquerda com casas a andar - descer usando marcha atras
+'''
+
+
+Sound.speak('Ready')
+
+
+def runInParallel(*fns):
+  proc = []
+
+  for fn in fns:
+    p = Process(target=fn)
+    p.start()
+    proc.append(p)
+
+  for p in proc:
+    p.join()
+
+runInParallel(colorTest.check_colour(),move_forward(2))
+
+'''
+s = Process(target=colorTest.check_colour())
+t = Process(target=move_forward(2))
+
+s.start()
+t.start()
+
+s.join()
+t.join()
+
 '''
