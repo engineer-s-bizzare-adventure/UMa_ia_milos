@@ -24,6 +24,7 @@ import colorTest
     definir a melhor velocidade para a garra abrir e fechar
     definir quantas rotações (ou segundos) são necessarias para andar 1 casa
     definir os angulos de rotação
+    definir multiprocessing para andar e fazer a leitura ao mesmo tempo
 '''
 ##########################################################################################
 #motores
@@ -43,7 +44,7 @@ ROTACOES_CASA = 2.2 #cada casa é +/- 2.2 rotações
 DISTANCIA_PROCURA = 40 #distância maxima a que o objeto tem de estar
 DISTANCIA_MIN = 10 #distância final do robot ao objeto
 
-VELOCIDADE_PADRAO = 10
+VELOCIDADE_PADRAO = 40
 VELOCIDADE_PROCURA = 20 #velocidade durante a procura, mais lenta para maior precisão
 VELOCIDADE_AJUSTE = 10 #velocidade para ajustar a posição do robot, super lento para não andar em excesso aos zig zags
 

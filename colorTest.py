@@ -46,7 +46,7 @@ def check_colour():
 def convert_lista():
 
     for i in lista:
-        if i == '´green':
+        if i == 'green':
             lista_final.append('X')
         if i == 'blue':
             lista_final.append('O')
@@ -58,4 +58,5 @@ def convert_lista():
     print(' '.join(lista_final))
     sleep(10)
     
-
+#amarelo verde verde azul amarelo verde azul castanho vermelho
+#   -     X      X    O      -      X    O      +
