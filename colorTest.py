@@ -18,6 +18,13 @@ def adiciona_pecas(type):
 cl = ColorSensor() 
 cl.mode='COL-COLOR'
 
+def forward(amount):
+    ma = LargeMotor('outA')
+    md = LargeMotor('outD')
+
+    ma.run_to_rel_pos(position_sp=amount, speed_sp=50, stop_action="brake")
+    md.run_to_rel_pos(position_sp=amount, speed_sp=50, stop_action="brake")
+
 def check_colour():
     colors=('unknown','black','blue','green','yellow','red','white','brown')
 
