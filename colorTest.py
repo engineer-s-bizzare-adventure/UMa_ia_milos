@@ -64,6 +64,7 @@ def convert_lista():
     
     print(' '.join(lista_final))
     sleep(10)
-    
+            
+            
 #amarelo verde verde azul amarelo verde azul castanho vermelho
 #   -     X      X    O      -      X    O      +
