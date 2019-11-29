@@ -77,7 +77,7 @@ def move_forward(casas): #anda 'casas' elementos da matriz para a frente
     
     conta_casas = 0
 
-    while conta_casas < casas and CONTINUA = True :
+    while conta_casas < casas :
         steer_pair.on_for_rotations(steering=0, speed=VELOCIDADE_PADRAO, rotations=ROTACOES_CASA)
         conta_casas+=1
         steer_pair.wait_until_not_moving
@@ -294,18 +294,23 @@ atualizar posicao a cada uso de funcao
 
 apanhou = False
 
+cl = ColorSensor() 
+cl.mode='COL-COLOR'
+
 def ler_cor(funcao):
     colors=('unknown','black','blue','green','yellow','red','white','brown')
-        while True:
-            if colors[cl.value()] == 'red':
-                break
-            else: 
-                if colors[cl.value()] != 'white' and colors[cl.value()] != 'unknown' and colors[cl.value()] != 'black' and colors[cl.value()] != 'red' :
-                   CONTINUA = False
-                   funcao
-                   apanhou = True
-                    while colors[cl.value()] == current_color:
-                        pass
+    while True:
+        current_color = 'white'
+        if colors[cl.value()] == 'red':
+            n._delete()
+            break
+        else: 
+            if colors[cl.value()] != 'white' and colors[cl.value()] != 'unknown' and colors[cl.value()] != 'black' and colors[cl.value()] != 'red' :
+                n._delete()
+                funcao
+                apanhou = True
+                while colors[cl.value()] == current_color:
+                    pass
     
 
 Sound.speak('Ready')
