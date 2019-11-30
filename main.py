@@ -43,7 +43,6 @@ us.mode='US-DIST-CM'
 ROTACOES_CASA = 2.2 #cada casa é +/- 2.2 rotações
 DISTANCIA_PROCURA = 40 #distância maxima a que o objeto tem de estar
 DISTANCIA_MIN = 10 #distância final do robot ao objeto
-CONTINUA = True
 
 VELOCIDADE_PADRAO = 10
 VELOCIDADE_PROCURA = 20 #velocidade durante a procura, mais lenta para maior precisão
@@ -74,14 +73,14 @@ def ajustar():
 
 
 def move_forward(casas): #anda 'casas' elementos da matriz para a frente
-    
     conta_casas = 0
 
-    while conta_casas < casas and CONTINUA = True :
+    while conta_casas < casas:
         steer_pair.on_for_rotations(steering=0, speed=VELOCIDADE_PADRAO, rotations=ROTACOES_CASA)
         conta_casas+=1
         steer_pair.wait_until_not_moving
         #ajustar() #ainda por testar (basicamente o codigo abaixo, mas numa função, porque se repete varias vezes)
+        
         gyro.angle
         while gyro.angle < ANGULO_AJUSTAMENTO:
             steer_pair.on(steering=-100, speed=VELOCIDADE_AJUSTE)
@@ -290,36 +289,12 @@ atualizar posicao a cada uso de funcao
     podemos usar direita e esquerda com casas a andar - descer usando marcha atras
 '''
 
-#Scuffed code do luis/wilson
-
-apanhou = False
-
-def ler_cor(funcao):
-    colors=('unknown','black','blue','green','yellow','red','white','brown')
-        while True:
-            if colors[cl.value()] == 'red':
-                break
-            else: 
-                if colors[cl.value()] != 'white' and colors[cl.value()] != 'unknown' and colors[cl.value()] != 'black' and colors[cl.value()] != 'red' :
-                   CONTINUA = False
-                   funcao
-                   apanhou = True
-                    while colors[cl.value()] == current_color:
-                        pass
-    
 
 Sound.speak('Ready')
 
 
-#t = Thread(target=colorTest.check_colour)
-#t.start()
+t = Thread(target=colorTest.check_colour)
+t.start()
 
-#s = Thread(target=move_forward(2))
-#s.start()
-
-n = Thread(target= move_forward(2))
-n.start()
-
-m = Thread(target=ler_cor(pick))
-m.start()
-
+s = Thread(target=move_forward(2))
+s.start()
