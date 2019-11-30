@@ -44,7 +44,7 @@ ROTACOES_CASA = 2.2 #cada casa é +/- 2.2 rotações
 DISTANCIA_PROCURA = 40 #distância maxima a que o objeto tem de estar
 DISTANCIA_MIN = 10 #distância final do robot ao objeto
 
-VELOCIDADE_PADRAO = 10
+VELOCIDADE_PADRAO = 30
 VELOCIDADE_PROCURA = 20 #velocidade durante a procura, mais lenta para maior precisão
 VELOCIDADE_AJUSTE = 10 #velocidade para ajustar a posição do robot, super lento para não andar em excesso aos zig zags
 
@@ -59,6 +59,10 @@ ANGULO_180 = 179
 #############################################
 #           Funcoes Base Robot              #
 #############################################
+def reset_gyro():
+    gyro.mode = 'GYRO-RATE'
+    gyro.mode = 'GYRO-ANG'
+
 def ajustar():
     gyro.angle
     while gyro.angle < ANGULO_AJUSTAMENTO:
@@ -70,7 +74,6 @@ def ajustar():
         steer_pair.on(steering=100, speed=VELOCIDADE_AJUSTE)
         gyro.angle
     steer_pair.wait_until_not_moving
-
 
 def move_forward(casas): #anda 'casas' elementos da matriz para a frente
     conta_casas = 0
@@ -162,8 +165,7 @@ funcao que verifica se há figura completa e atribui pontos
 
 def procura():
     #troca o modo do gyro para dar reset à posição
-    gyro.mode = 'GYRO-RATE'
-    gyro.mode = 'GYRO-ANG'
+    reset_gyro()
 
     encontra = False
     distance = us.value()/10 #lê e guarda na variavel a distancia do centro do sensor ao objeto
@@ -218,16 +220,18 @@ def procura():
         gyro.angle
     steer_pair.wait_until_not_moving
 
-    
     turn_right(ANGULO_90) #roda para a direita, para alinhar à lista de peças
+    reset_gyro()
     
     sleep(5) #começar a leitura de peças e guarda num array e volta ao inicio (?de marcha atras?)
-    '''
-        PLEASE CODE HERE
-    '''
+    t = Thread(target=colorTest.check_colour)
+    t.start()
+
+    move_forward(2)
     
     #volta à matriz:
     turn_left(ANGULO_90) #roda para a esquerda, para alinhar à matriz
+    reset_gyro()
     turn_left(angulo_matriz-1) #ronda para a esquerda o angulo guardado anterior, para alinhar ao objeto
     
     #anda para tras até distancia ser a distancia inicial (voltar exatamente ao ponto de inicio de procura)
@@ -259,15 +263,12 @@ def procura():
 #############################################
 #troca o modo do gyro para dar reset à posição
 
-gyro.mode = 'GYRO-RATE'
-gyro.mode = 'GYRO-ANG'
 
-'''
-move_forward(4) #subir até a posição [0][0]
+#move_forward(4) #subir até a posição [0][0]
 procura() #iniciar a procura da lista de peças -- (esta funcão já da reset ao gyro, cuidado!)
 
 
-'''
+
 
 
 #exemplo (nao sei)
@@ -290,11 +291,5 @@ atualizar posicao a cada uso de funcao
 '''
 
 
-Sound.speak('Ready')
+Sound.speak('please kill me i feel only pai')
 
-
-t = Thread(target=colorTest.check_colour)
-t.start()
-
-s = Thread(target=move_forward(2))
-s.start()

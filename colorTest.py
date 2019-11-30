@@ -29,7 +29,7 @@ def check_colour():
     colors=('unknown','black','blue','green','yellow','red','white','brown')
 
     while True:    
-        current_color = 'white'
+        current_color = cl.value()
         if colors[cl.value()] == 'red':
             '''
             for i in lista:
