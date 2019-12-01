@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-#from ev3dev2.sound import Sound #dicionário que permite tocar músicas
+
+from ev3dev2.sound import Sound #dicionário que permite tocar músicas
 from ev3dev.ev3 import * #nao sei a diferença do de cima
 from time import sleep
 #from threading import Thread #dicionário que permite executar ações ao mesmo tempo
 from multiprocessing import Process #multi-process
-    #dicionário dos motores disponíveis e usados no robot
-from ev3dev2.motor import LargeMotor, MediumMotor, MoveSteering, OUTPUT_D, OUTPUT_A, OUTPUT_B, SpeedRPS
+from ev3dev2.motor import LargeMotor, MediumMotor, MoveSteering, OUTPUT_D, OUTPUT_A, OUTPUT_B, SpeedRPS #dicionário dos motores disponíveis e usados no robot
 from PIL import Image #dicionário que permite apresentar imagens .bmp no lcd
 from ev3dev2.sensor.lego import GyroSensor
 from threading import Thread #dicionário que permite executar ações ao mesmo tempo
@@ -13,6 +13,8 @@ from threading import Thread #dicionário que permite executar ações ao mesmo 
 import os
 #os.system('setfont Lat15-TerminusBold14')
 os.system('setfont Lat15-TerminusBold32x16')
+
+mySound = Sound()
 
 import colorTest
 
@@ -48,6 +50,8 @@ VELOCIDADE_PADRAO = 30
 VELOCIDADE_PROCURA = 20 #velocidade durante a procura, mais lenta para maior precisão
 VELOCIDADE_AJUSTE = 10 #velocidade para ajustar a posição do robot, super lento para não andar em excesso aos zig zags
 
+#variaveis globais
+
 #angulos por padrão
 ANGULO_AJUSTAMENTO = 2 #angulo para ajustar a direção do robot (andar o mais reto possivel) -- talvez mudar para 0 --
 ANGULO_60 = 59
@@ -63,27 +67,8 @@ def reset_gyro():
     gyro.mode = 'GYRO-RATE'
     gyro.mode = 'GYRO-ANG'
 
-def ajustar():
-    gyro.angle
-    while gyro.angle < ANGULO_AJUSTAMENTO:
-        steer_pair.on(steering=-100, speed=VELOCIDADE_AJUSTE)
-        gyro.angle
-    steer_pair.wait_until_not_moving
-    gyro.angle
-    while gyro.angle > ANGULO_AJUSTAMENTO:
-        steer_pair.on(steering=100, speed=VELOCIDADE_AJUSTE)
-        gyro.angle
-    steer_pair.wait_until_not_moving
-
-def move_forward(casas): #anda 'casas' elementos da matriz para a frente
-    conta_casas = 0
-
-    while conta_casas < casas:
-        steer_pair.on_for_rotations(steering=0, speed=VELOCIDADE_PADRAO, rotations=ROTACOES_CASA)
-        conta_casas+=1
-        steer_pair.wait_until_not_moving
-        #ajustar() #ainda por testar (basicamente o codigo abaixo, mas numa função, porque se repete varias vezes)
-        
+def ajustar(movimento):
+    if movimento == 'forward':
         gyro.angle
         while gyro.angle < ANGULO_AJUSTAMENTO:
             steer_pair.on(steering=-100, speed=VELOCIDADE_AJUSTE)
@@ -94,19 +79,10 @@ def move_forward(casas): #anda 'casas' elementos da matriz para a frente
             steer_pair.on(steering=100, speed=VELOCIDADE_AJUSTE)
             gyro.angle
         steer_pair.wait_until_not_moving
-    steer_pair.off()    
 
-
-def move_backward(casas): #anda 'casas' elementos da matriz para tras
-    conta_casas = 0
-
-    while conta_casas < casas:
-        steer_pair.on_for_rotations(steering=0, speed=-VELOCIDADE_PADRAO, rotations=ROTACOES_CASA)
-        conta_casas+=1
-        steer_pair.wait_until_not_moving
-        #ajustar_inverso?? -- por testar -- (supostamente o ajustar normal deverá funcionar)
-        
         gyro.angle
+    
+    if movimento == 'backward':
         while gyro.angle > ANGULO_AJUSTAMENTO:
             steer_pair.on(steering=-100, speed=-VELOCIDADE_AJUSTE)
             gyro.angle
@@ -116,6 +92,37 @@ def move_backward(casas): #anda 'casas' elementos da matriz para tras
             steer_pair.on(steering=100, speed=-VELOCIDADE_AJUSTE)
             gyro.angle
         steer_pair.wait_until_not_moving
+
+def move_forward(casas): #anda 'casas' elementos da matriz para a frente
+    conta_casas = 0
+
+    while conta_casas < casas:
+        steer_pair.on_for_rotations(steering=0, speed=VELOCIDADE_PADRAO, rotations=ROTACOES_CASA)
+        conta_casas+=1
+        steer_pair.wait_until_not_moving
+        ajustar('forward') 
+    steer_pair.off()    
+
+
+def move_forward_read(casas): 
+    conta_casas = 0
+    while conta_casas < casas:
+        if colorTest.completed_reading:
+            break
+        else:
+            steer_pair.on_for_rotations(steering=0, speed=VELOCIDADE_PADRAO, rotations=ROTACOES_CASA)
+            conta_casas+=1
+            steer_pair.wait_until_not_moving 
+    steer_pair.off() 
+
+def move_backward(casas): #anda 'casas' elementos da matriz para tras
+    conta_casas = 0
+
+    while conta_casas < casas:
+        steer_pair.on_for_rotations(steering=0, speed=-VELOCIDADE_PADRAO, rotations=ROTACOES_CASA)
+        conta_casas+=1
+        steer_pair.wait_until_not_moving
+        ajustar('backward')
     steer_pair.off()   
 
 
@@ -125,6 +132,7 @@ def turn_right(angulo): #vira 'angulo' para a direita
     steer_pair.on(steering=100, speed=VELOCIDADE_PADRAO)
     gyro.wait_until_angle_changed_by(angulo)
     steer_pair.off() 
+    reset_gyro()
 
 
 def turn_left(angulo): #vira 'angulo' para a esquerda
@@ -134,6 +142,7 @@ def turn_left(angulo): #vira 'angulo' para a esquerda
     #ROTAÇÃO DE APROXIMADAMENTE 90º
     gyro.wait_until_angle_changed_by(angulo)
     steer_pair.off() 
+    reset_gyro()
 
 
 def pick():
@@ -227,7 +236,7 @@ def procura():
     t = Thread(target=colorTest.check_colour)
     t.start()
 
-    move_forward(2)
+    move_forward_read(3)
     
     #volta à matriz:
     turn_left(ANGULO_90) #roda para a esquerda, para alinhar à matriz
@@ -243,17 +252,7 @@ def procura():
 
     #alinha o robot:
     #ajustar() #ainda por testar (basicamente o codigo abaixo, mas numa função, porque se repete varias vezes)
-    gyro.angle
-    steer_pair.on(steering=-100, speed=VELOCIDADE_AJUSTE)
-    while gyro.angle < ANGULO_AJUSTAMENTO:
-        gyro.angle
-        steer_pair.wait_until_not_moving
-    
-    gyro.angle
-    steer_pair.on(steering=100, speed=VELOCIDADE_AJUSTE)    
-    while gyro.angle > ANGULO_AJUSTAMENTO:
-        gyro.angle
-        steer_pair.wait_until_not_moving
+    ajustar('forward')
 
     steer_pair.off()
 
@@ -261,14 +260,8 @@ def procura():
 #############################################
 #              TEST FUNCTIONS               #
 #############################################
-#troca o modo do gyro para dar reset à posição
 
-
-#move_forward(4) #subir até a posição [0][0]
 procura() #iniciar a procura da lista de peças -- (esta funcão já da reset ao gyro, cuidado!)
-
-
-
 
 
 #exemplo (nao sei)
@@ -289,7 +282,4 @@ ou
 atualizar posicao a cada uso de funcao
     podemos usar direita e esquerda com casas a andar - descer usando marcha atras
 '''
-
-
-Sound.speak('please kill me i feel only pai')
 
