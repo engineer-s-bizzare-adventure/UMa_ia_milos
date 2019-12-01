@@ -4,13 +4,15 @@
 from ev3dev.ev3 import *
 from time  import sleep
 
-
-# Connect EV3 color and touch sensors to any sensor ports
 lista = []
 lista_final = []
+
 #Adicionar as peças numa lista
 def adiciona_pecas(type):
     lista.append(type)
+
+#variaveis globais
+completed_reading = False
 
 
 # Put the color sensor into COL-COLOR mode.
@@ -18,26 +20,17 @@ def adiciona_pecas(type):
 cl = ColorSensor() 
 cl.mode='COL-COLOR'
 
-def forward(amount):
-    ma = LargeMotor('outA')
-    md = LargeMotor('outD')
-
-    ma.run_to_rel_pos(position_sp=amount, speed_sp=50, stop_action="brake")
-    md.run_to_rel_pos(position_sp=amount, speed_sp=50, stop_action="brake")
 
 def check_colour():
     colors=('unknown','black','blue','green','yellow','red','white','brown')
 
     while True:    
-        current_color = 'white'
+        current_color = cl.value()
         if colors[cl.value()] == 'red':
-            '''
-            for i in lista:
-                Sound.speak(i)
-                sleep(2)
-            '''
+            completed_reading = True
             convert_lista()
             break
+
         else:
             if colors[cl.value()] != 'white' and colors[cl.value()] != 'unknown' and colors[cl.value()] != 'black' and colors[cl.value()] != 'red' :
                 adiciona_pecas(colors[cl.value()])
