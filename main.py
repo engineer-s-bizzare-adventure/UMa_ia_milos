@@ -218,16 +218,7 @@ def procura():
     
     #alinha o robot antes de iniciar a leitura da lista de peças
     #ajustar() #ainda por testar (basicamente o codigo abaixo, mas numa função, porque se repete varias vezes)
-    gyro.angle
-    while gyro.angle < ANGULO_AJUSTAMENTO:
-        steer_pair.on(steering=-100, speed=VELOCIDADE_AJUSTE)
-        gyro.angle
-    steer_pair.wait_until_not_moving
-    gyro.angle
-    while gyro.angle > ANGULO_AJUSTAMENTO:
-        steer_pair.on(steering=100, speed=VELOCIDADE_AJUSTE)
-        gyro.angle
-    steer_pair.wait_until_not_moving
+    ajustar('forward') 
 
     turn_right(ANGULO_90) #roda para a direita, para alinhar à lista de peças
     reset_gyro()
