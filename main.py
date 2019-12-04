@@ -104,17 +104,6 @@ def move_forward(casas): #anda 'casas' elementos da matriz para a frente
     steer_pair.off()    
 
 
-def move_forward_read(casas): 
-    conta_casas = 0
-    while conta_casas < casas:
-        if colorTest.completed_reading:
-            break
-        else:
-            steer_pair.on_for_rotations(steering=0, speed=VELOCIDADE_PADRAO, rotations=ROTACOES_CASA)
-            conta_casas+=1
-            steer_pair.wait_until_not_moving 
-    steer_pair.off() 
-
 def move_backward(casas): #anda 'casas' elementos da matriz para tras
     conta_casas = 0
 
@@ -233,10 +222,8 @@ def procura():
     reset_gyro()
     
     sleep(5) #começar a leitura de peças e guarda num array e volta ao inicio (?de marcha atras?)
-    t = Thread(target=colorTest.check_colour)
-    t.start()
 
-    move_forward_read(3)
+    colorTest.check_colour()
     
     #volta à matriz:
     turn_left(ANGULO_90) #roda para a esquerda, para alinhar à matriz
@@ -256,13 +243,20 @@ def procura():
 
     steer_pair.off()
 
+def music():
+    Sound.play("sounds/titanic.wav").wait()
 
 #############################################
 #              TEST FUNCTIONS               #
 #############################################
 
-procura() #iniciar a procura da lista de peças -- (esta funcão já da reset ao gyro, cuidado!)
 
+procura() #iniciar a procura da lista de peças -- (esta funcão já da reset ao gyro, cuidado!)
+'''
+s = Thread(target=music)
+s.start()
+'''
+music()
 
 #exemplo (nao sei)
 #############################################
