@@ -17,6 +17,7 @@ os.system('setfont Lat15-TerminusBold32x16')
 mySound = Sound()
 
 import colorTest
+import coord
 
             #############################################
             #               TO DO LIST                  #
@@ -241,13 +242,13 @@ def music():
 #              TEST FUNCTIONS               #
 #############################################
 
-
-procura() #iniciar a procura da lista de peças -- (esta funcão já da reset ao gyro, cuidado!)
+coord.move()
+#procura() #iniciar a procura da lista de peças -- (esta funcão já da reset ao gyro, cuidado!)
 '''
 s = Thread(target=music)
 s.start()
 '''
-music()
+#music()
 
 #exemplo (nao sei)
 #############################################
