@@ -1,5 +1,7 @@
 import random
 
+import colorTest
+
 DIMENSAO_TABULEIRO = 5
 NUMERO_PECAS = 25
 #######################################
@@ -19,11 +21,30 @@ def mostra_tabuleiro(tabuleiro):
         print()
 
 def define_pecas():
-    #return [random.choice('x+-o') for _ in range(25)] 
-    return [random.choice('x') for _ in range(NUMERO_PECAS)] 
+    return [random.choice('x+-o') for _ in range(25)] 
+    #return [random.choice('+') for _ in range(NUMERO_PECAS)] 
+    
 
 def mostra_lista(lista_pecas):
     print(lista_pecas)
+
+def heuristica_aleatoria(tabuleiro):
+    linha = random.randint(1, DIMENSAO_TABULEIRO) #random entre 1 e 5
+    coluna = random.randint(1, DIMENSAO_TABULEIRO) #random entre 1 e 5
+
+    s_posicao = str(linha) + "," + str(coluna)
+    print (s_posicao)
+    jogada = eval(s_posicao)
+
+    while not possivel(tabuleiro,jogada):
+        linha = random.randint(1, DIMENSAO_TABULEIRO) #random entre 1 e 5
+        coluna = random.randint(1, DIMENSAO_TABULEIRO) #random entre 1 e 5
+
+        s_posicao = str(linha) + "," + str(coluna)
+        print (s_posicao)
+        jogada = eval(s_posicao)
+
+    return jogada
 
 def pede_jogada(tabuleiro):
     jogada = eval(input('A sua jogada (linha,coluna)?: '))
@@ -43,6 +64,7 @@ def actualiza_tabuleiro(tabuleiro, jogada, peca):
     tabuleiro[jogada[0]-1][jogada[1]-1] = peca
     return tabuleiro
 
+
 def vence_menos(tabuleiro, peca):
     for i in range(len(tabuleiro)):
         conta = 0
@@ -57,21 +79,66 @@ def vence_menos(tabuleiro, peca):
             #break
     return False
 
-def figura_x(tabuleiro, peca):
-    limite = len(tabuleiro)-2 #-2 pois são precisos pelo menos 3 'x' para formar a figura
+
+def figura_plus(tabuleiro, peca):
+    #ignora a coluna das pontas
+    limite_fim = len(tabuleiro)-1 #ignora ultima coluna
+    limite = len(tabuleiro)-2 #ignora ultimas 2 linhas
     result = 0
-    #ENCONTRAR PRIMEIRO X DE LINHA EM LINHA
-    for linha in range(limite): 
-        for coluna in range(limite): #procura por todas as colunas de cada linha
+    for linha in range(limite):
+        coluna = 1 #ignora primeira coluna
+        for coluna in range(limite_fim):
             if tabuleiro[linha][coluna] == peca:
-                if diagonal_fig_x(tabuleiro, linha, coluna):
+                if coluna_fig_plus(tabuleiro, linha, coluna, peca):
                     result+=1
                     #print("FANTASTICO, [", str(linha), "][", str(coluna), "]", end="||||")
                     #print("PONTOS GANHOS: ", 2**remove_fig_x(tabuleiro, linha, coluna))
                     #return True
     print(result, " COMBINACOES POSSIVEIS!!")
 
-def remove_fig_x(tabuleiro, linha, coluna):
+
+
+def coluna_fig_plus(tabuleiro, linha, coluna, peca):
+    col_lin = 0
+    tamanho_min_fig = 3
+    tamanho_fig = len(tabuleiro)
+    if tamanho_fig % 2 == 0: #PARA O +, A DIAGONAL TEM DE SER IMPAR
+        tamanho_fig -= 1
+
+    while (linha + tamanho_fig > len(tabuleiro) or coluna + tamanho_fig > len(tabuleiro) ):
+        tamanho_fig -= 2
+
+    linhas_init = tamanho_fig//2 #parte inteira da divisao
+
+    while tamanho_fig >= tamanho_min_fig and col_lin != tamanho_fig:
+        for i in range(tamanho_fig):
+            if tabuleiro[linha+i][coluna] == peca and tabuleiro[linha+linhas_init][coluna+i-1] == peca:
+                col_lin+=1
+        if(col_lin == tamanho_fig):
+            return True
+        tamanho_fig -= 2
+        linhas_init = tamanho_fig//2 #parte inteira da divisao
+        col_lin = 0
+
+    return col_lin == tamanho_fig
+
+
+
+def figura_x(tabuleiro, peca):
+    limite = len(tabuleiro)-2 #-2 pois são precisos pelo menos 3 'x' para formar a figura (ignora ultimas 2 colunas)
+    result = 0
+    #ENCONTRAR PRIMEIRO X DE LINHA EM LINHA
+    for linha in range(limite): 
+        for coluna in range(limite): #procura por todas as colunas de cada linha
+            if tabuleiro[linha][coluna] == peca:
+                if diagonal_fig_x(tabuleiro, linha, coluna, peca):
+                    result+=1
+                    #print("FANTASTICO, [", str(linha), "][", str(coluna), "]", end="||||")
+                    #print("PONTOS GANHOS: ", 2**remove_fig_x(tabuleiro, linha, coluna))
+                    #return True
+    print(result, " COMBINACOES POSSIVEIS!!")
+
+def remove_fig_x(tabuleiro, linha, coluna, peca):
     diagonais = 0
     tamanho_fig = len(tabuleiro)
 
@@ -86,9 +153,10 @@ def remove_fig_x(tabuleiro, linha, coluna):
             tabuleiro[linha+i][coluna+i] = '#' 
             tabuleiro[linha+i][coluna + tamanho_fig-1-i] = '#'
             diagonais+=1
-        return 2*tamanho_fig-1
 
-def diagonal_fig_x(tabuleiro, linha, coluna):
+    return 2*tamanho_fig-1 
+
+def diagonal_fig_x(tabuleiro, linha, coluna, peca):
     diagonais = 0
     tamanho_min_fig = 3
     tamanho_fig = len(tabuleiro)
@@ -140,57 +208,3 @@ def encontra_circulo(tabuleiro, peca):
                 conta_linha -= 1
                 
     return False
-
-def teste(tabuleiro):
-    tabuleiro[0][0] = '#'
-    mostra_tabuleiro(tabuleiro)
-
-# inicializa tabuleiro
-tabuleiro = inicializa_tabuleiro(DIMENSAO_TABULEIRO)
-# inicializa pecas
-lista_pecas = define_pecas()
-
-# mostra tabuleiro
-mostra_tabuleiro(tabuleiro)
-# mostra lista de pecas aleatoria
-mostra_lista(lista_pecas)
-
-#teste(tabuleiro)
-
-# define jogador x ou +
-global p 
-p = 0
-
-while p+1 <= NUMERO_PECAS: # não há vencedor ou empate
-    peca = lista_pecas[p]
-    print('PEÇA: ' + peca)
-
-    # pede jogada
-    jogada = pede_jogada(tabuleiro)
-    # actualiza tabuleiro
-    tabuleiro = actualiza_tabuleiro(tabuleiro,jogada,peca)
-
-    # mostra tabuleiro
-    mostra_tabuleiro(tabuleiro)
-    
-    # Vencedor ou empate --> termina
-    if vence_menos(tabuleiro,'-') or encontra_circulo(tabuleiro,'o'):
-        print("=========== GG ===========")
-    """if vencedor(tabuleiro,peca) or empate(tabuleiro):
-        break"""
-    
-    if figura_x(tabuleiro, 'x'):
-        print("=========== GG ===========")
-        #mostra_tabuleiro(tabuleiro)
-
-    # proxima peca
-    p=p+1
-            
-    # mensagem final
-    """print('Finito...')
-    if empate(tabuleiro):
-        print('PERDEU O JOGO!')
-    elif peca == 'x':
-        print('FIGURA x CONCLUIDA!')
-    else:
-        print('FIGURA + CONCLUIDA!')"""
