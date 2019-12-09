@@ -46,7 +46,7 @@ gyro.mode='GYRO-ANG'
 us.mode='US-DIST-CM'
 
 #constantes
-ROTACOES_CASA = 2 #cada casa é +/- 2.2 rotações
+ROTACOES_CASA = 1.8 #cada casa é +/- 2.2 rotações
 DISTANCIA_PROCURA = 60 #distância maxima a que o objeto tem de estar
 DISTANCIA_MIN = 10 #distância final do robot ao objeto
 
@@ -61,7 +61,7 @@ posicao_coluna = 0
 posicao_linha = 5
 
 #angulos por padrão
-ANGULO_AJUSTAMENTO = 1 #angulo para ajustar a direção do robot (andar o mais reto possivel) -- talvez mudar para 0 --
+ANGULO_AJUSTAMENTO = 0 #angulo para ajustar a direção do robot (andar o mais reto possivel) -- talvez mudar para 0 --
 ANGULO_60 = 59
 ANGULO_90 = 82
 ANGULO_180 = 179
@@ -82,18 +82,20 @@ def ajustar():
             steer_pair.on(steering=100, speed=VELOCIDADE_AJUSTE)
         else:
             steer_pair.on(steering=-100, speed=VELOCIDADE_AJUSTE)
-    
+        gyro.angle
     steer_pair.off()
 
 def move_forward(casas): #anda 'casas' elementos da matriz para a frente
-    conta_casas = 0
+    #conta_casas = 0
     global posicao_coluna, posicao_linha
 
-    while conta_casas < casas:
+    steer_pair.on_for_rotations(steering=0, speed=VELOCIDADE_PADRAO, rotations=casas*ROTACOES_CASA)
+
+    '''while conta_casas < casas:
         steer_pair.on_for_rotations(steering=0, speed=VELOCIDADE_PADRAO, rotations=ROTACOES_CASA)
         conta_casas+=1
         steer_pair.wait_until_not_moving()
-    steer_pair.off()  
+    steer_pair.off()  '''
 
     if in_matriz : #garantir que esta na matriz
         if direcao == 'esquerda':
@@ -109,11 +111,14 @@ def move_forward(casas): #anda 'casas' elementos da matriz para a frente
 def move_backward(casas): #anda 'casas' elementos da matriz para tras
     conta_casas = 0
     global posicao_coluna, posicao_linha
-    while conta_casas < casas:
+    
+    '''while conta_casas < casas:
         steer_pair.on_for_rotations(steering=0, speed=-VELOCIDADE_PADRAO, rotations=ROTACOES_CASA)
         conta_casas+=1
         steer_pair.wait_until_not_moving
-    steer_pair.off()
+    steer_pair.off()'''
+
+    steer_pair.on_for_rotations(steering=0, speed=-VELOCIDADE_PADRAO, rotations=casas*ROTACOES_CASA)
 
     if in_matriz : #garantir que esta na matriz
         if direcao == 'esquerda':
@@ -134,41 +139,49 @@ def turn_right(angulo): #vira 'angulo' para a direita
     steer_pair.off() 
     
     Sound.speak("TOUCH ME!")
-    while not ts.is_pressed:
-        reset_gyro()
 
     if in_matriz : #garantir que esta na matriz
         if direcao == 'direita' and angulo == ANGULO_90: #se tiver virado para a direita e voltar a virar, fica para baixo
             direcao = 'descer'
         elif direcao == 'esquerda' and angulo == ANGULO_90: #se tiver virado para a esquerda e voltar a direita, fica para cima
             direcao = 'subir'
+            #ajustar()
         elif direcao == 'descer' and angulo == ANGULO_90: #se tiver virado para baixo e voltar a direita, fica para esquerda
             direcao = 'esquerda'
         elif direcao == 'subir' and angulo == ANGULO_90:
             direcao = 'direita'
+    
+    while not ts.is_pressed:
+        pass
+    sleep(0.3)
+    #reset_gyro()
 
 
 def turn_left(angulo): #vira 'angulo' para a esquerda
     steer_pair.wait_until_not_moving
     steer_pair.on(steering=-100, speed=VELOCIDADE_PADRAO)
     global direcao
+    
     #ROTAÇÃO DE APROXIMADAMENTE 90º
     gyro.wait_until_angle_changed_by(angulo)
     steer_pair.off() 
     
-    Sound.speak("TOUCH ME!")
-    while not ts.is_pressed:
-        reset_gyro()
-
     if in_matriz : #garantir que esta na matriz
         if direcao == 'esquerda' and angulo == ANGULO_90: #se tiver virado para a esquerda e voltar a virar, fica para baixo
             direcao = 'descer'
         elif direcao == 'direita' and angulo == ANGULO_90: #se tiver virado para a direita e voltar a esquerda, fica para cima
             direcao = 'subir'
+            #ajustar()
         elif direcao == 'descer' and angulo == ANGULO_90: #se tiver virado para baixo e voltar a esquerda, fica para direita
             direcao = 'direita'
         elif direcao == 'subir' and angulo == ANGULO_90:
             direcao = 'esquerda'
+
+    Sound.speak("TOUCH ME!")
+    while not ts.is_pressed:
+        pass
+    sleep(0.3)
+    #reset_gyro()
 
 
 def pick():
@@ -386,11 +399,14 @@ def coloca_peca(jogada):
 
     #ir para coluna certa
     if(jogada[1]>posicao_coluna):
-        turn_left(ANGULO_90)
+        if direcao == 'descer':
+            turn_left(ANGULO_90)
+        elif direcao == 'subir':
+            turn_right(ANGULO_90)
         move_forward(jogada[1] - posicao_coluna)
-    elif(jogada[1]<posicao_coluna):
-        turn_left(ANGULO_90)
-        move_forward(posicao_coluna - jogada[1])
+    #elif(jogada[1]<posicao_coluna):
+    #    turn_left(ANGULO_90)
+    #    move_forward(posicao_coluna - jogada[1])
 
     '''if(jogada[1]>posicao_coluna):
         if direcao == 'subir':
@@ -411,8 +427,10 @@ def coloca_peca(jogada):
             turn_right(ANGULO_90)
         move_forward(posicao_coluna - jogada[1])'''
 
-    sleep(2)
+    move_backward(0.1)
+    sleep(1)
     drop()
+    #move_backward(0.3)
     sleep(2)
 
 #############################################
@@ -440,9 +458,11 @@ while True:
     turn_right(ANGULO_90)
 '''
 
-
+#turn_left(90)
+#sleep(20)
 
 ##############################################################
+
 reset_gyro()
 in_matriz = True
 direcao = 'subir'
@@ -452,6 +472,10 @@ posicao_linha = 5
 posicao_coluna = 1
 
 move_forward(4) #só sobe
+
+Sound.speak("TOUCH ME!")
+while not ts.is_pressed:
+    pass
 
 in_matriz = False #sai da matriz para procurar e fazer leitura das peças
 procura() #procura, le peças, guarda e volta ao sitio [0,0]
@@ -468,7 +492,7 @@ tabuleiro = figuma_sim.inicializa_tabuleiro(figuma_sim.DIMENSAO_TABULEIRO)
 lista_pecas = colorTest.lista_final
 
 # mostra tabuleiro
-figuma_sim.mostra_tabuleiro(tabuleiro)
+#figuma_sim.mostra_tabuleiro(tabuleiro)
     
 # mostra lista de pecas
 figuma_sim.mostra_lista(lista_pecas)
@@ -484,12 +508,9 @@ while p+1 <= len(lista_pecas):
     # pede jogada
 
     #BUSCAR PEÇA ?????
-    print("SOBE")
     sobe_busca_peca()
     in_matriz = False #sai da matriz para buscar peça
-    print("busca")
     busca_peca() #procura, vai ate peça, apanha e volta ao sitio
-    print("agraa")
     in_matriz = True #voltou à matriz
 
     #jogada = pede_jogada(tabuleiro)
@@ -504,7 +525,7 @@ while p+1 <= len(lista_pecas):
     tabuleiro = figuma_sim.actualiza_tabuleiro(tabuleiro,jogada,peca)
 
     # mostra tabuleiro
-    figuma_sim.mostra_tabuleiro(tabuleiro)
+    #figuma_sim.mostra_tabuleiro(tabuleiro)
         
     # Vencedor --> termina
 

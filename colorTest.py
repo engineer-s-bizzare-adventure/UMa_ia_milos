@@ -26,18 +26,38 @@ colors=('unknown','black','blue','green','yellow','red','white','brown')
 
 def peca():
     steer_pair.on(steering=0, speed=VELOCIDADE_PADRAO) 
-
+    sleep(0.3)
     while True:
-        print(colors[cl.value()] )
         if colors[cl.value()] == 'green' or colors[cl.value()] == 'blue' or colors[cl.value()] == 'yellow' or colors[cl.value()] == 'brown':
             break
 
     steer_pair.off()
 
 def check_colour():
+    colors=('unknown','black','blue','green','yellow','red','white','brown')
+    steer_pair.on(steering=0, speed=VELOCIDADE_PADRAO) 
+    sleep(0.3)
+    while colors[cl.value()] != 'red':
+        current_color = cl.value()
+
+        if colors[cl.value()] == 'green' or colors[cl.value()] == 'blue' or colors[cl.value()] == 'yellow' or  colors[cl.value()] == 'brown':
+            #print (current_color)
+            adiciona_pecas(colors[cl.value()])
+
+            while colors[cl.value()] != 'white':
+                pass
+
+    steer_pair.off()
+    convert_lista()
+    move_to_start()
+
+    
+
+'''def check_colour():
     num_rot = 0
     current_color = 'null'
     steer_pair.on(steering=0, speed=VELOCIDADE_PADRAO) 
+    sleep(0.3)
     while True:
         if colors[cl.value()] == 'red':
             steer_pair.off()
@@ -50,15 +70,16 @@ def check_colour():
                 num_rot += 1
                 adiciona_pecas(colors[cl.value()])
                 current_color = colors[cl.value()]
-                print (current_color)
+                #print (current_color)
                 #Sound.beep()
                 while colors[cl.value()] == current_color:
                     pass
-                print('next!')
 
+                #print('next!')
+'''
 def move_to_start():
     steer_pair.on(steering=0, speed=-VELOCIDADE_PADRAO)
-
+    sleep(0.3)
     '''while num_rot>0:
         if colors[cl.value()] != 'white' and colors[cl.value()] != 'unknown' and colors[cl.value()] != 'black' and colors[cl.value()] != 'red' :
             num_rot -= 1
@@ -86,7 +107,7 @@ def convert_lista():
             lista_final.append('+')
     
     print(' '.join(lista_final))
-    sleep(10)
+    sleep(4)
     
 #amarelo verde verde azul amarelo verde azul castanho vermelho
 #   -     X      X    O      -      X    O      +

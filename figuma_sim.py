@@ -33,7 +33,7 @@ def heuristica_aleatoria(tabuleiro):
     coluna = random.randint(1, DIMENSAO_TABULEIRO) #random entre 1 e 5
 
     s_posicao = str(linha) + "," + str(coluna)
-    print (s_posicao)
+    #print (s_posicao)
     jogada = eval(s_posicao)
 
     while not possivel(tabuleiro,jogada):
@@ -41,9 +41,10 @@ def heuristica_aleatoria(tabuleiro):
         coluna = random.randint(1, DIMENSAO_TABULEIRO) #random entre 1 e 5
 
         s_posicao = str(linha) + "," + str(coluna)
-        print (s_posicao)
+        #print (s_posicao)
         jogada = eval(s_posicao)
 
+    print (s_posicao)
     return jogada
 
 def pede_jogada(tabuleiro):
